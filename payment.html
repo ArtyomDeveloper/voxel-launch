@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxelaunch - Send Payment</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body.payment-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .payment-box .theme-switch-wrapper {
+            margin-bottom: 0; 
+            transform: scale(0.9); 
+        }
+         .payment-box .theme-switch {
+            width: 38px;
+            height: 38px;
+        }
+        .payment-box .theme-icon-sun,
+        .payment-box .theme-icon-moon {
+            font-size: 16px;
+        }
+        .payment-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; 
+        }
+        .payment-box-header h2 {
+            margin-bottom: 0; 
+        }
+        
+        /* Notification Modal Styles */
+        .notification-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .notification-modal.show {
+            opacity: 1;
+        }
+        .notification-content {
+            background-color: var(--surface-modal);
+            border-radius: var(--squircle-radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(var(--shadow-medium-rgb), 0.2);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .notification-modal.show .notification-content {
+            transform: scale(1);
+        }
+        .notification-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .notification-icon.success {
+            color: #10B981;
+        }
+        .notification-icon.error {
+            color: #EF4444;
+        }
+        .notification-content h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+        .notification-content p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 0 0 25px 0;
+        }
+        .notification-close-btn {
+            background-color: var(--brand-primary);
+            color: var(--text-on-brand);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            padding: 12px 30px;
+            border-radius: var(--squircle-radius-small);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+        }
+        .notification-close-btn:hover {
+            background-color: var(--brand-primary-hover);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="payment-page">
+
+    <div class="payment-box" id="paymentBox">
+        <div class="payment-box-header">
+            <h2>Send Payment</h2>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <span class="icon-container">
+                        <i class="fas fa-sun theme-icon-sun"></i>
+                        <i class="fas fa-moon theme-icon-moon"></i>
+                    </span>
+                </label>
+            </div>
+        </div>
+        <p class="modal-instruction">Please send <strong id="paymentAmount">0.1 SOL</strong> to the following address:</p>
+        <div class="address-box" id="paymentAddressBox">
+            <span id="paymentAddress">ngTXjUF5idhdxVToyp6KxqzogJtspPzcQf3wTu2WYdy</span>
+            <button id="copyAddressBtn" title="Copy address"><i class="fas fa-copy"></i></button>
+        </div>
+        <p class="network-info">Network: <strong id="paymentNetwork">Solana Mainnet</strong></p>
+        
+        <div class="modal-actions primary-actions">
+            <button class="modal-button primary" id="checkTransactionBtn">I've Sent SOL Manually</button>
+            <button class="modal-button secondary" id="cancelPaymentBtn">Cancel & Go Back</button>
+        </div>
+
+        <div class="payment-method-divider">
+            <span>OR CHOOSE AN ALTERNATIVE</span> 
+        </div>
+
+        <div class="modal-actions alternative-actions"> 
+            <button class="modal-button alternative" id="cryptomusBtn">
+                <i class="fas fa-coins"></i> Cryptomus
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Notification Modal -->
+    <div id="notificationModal" class="notification-modal" style="display: none;">
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i id="notificationIcon" class="fas fa-check-circle"></i>
+            </div>
+            <h3 id="notificationTitle">Notification</h3>
+            <p id="notificationMessage">This is a notification message.</p>
+            <button id="notificationCloseBtn" class="notification-close-btn">OK</button>
+        </div>
+    </div>
+
+    <script src="payment_script.js"></script>
+    <script src="theme.js"></script>
+</body>
+</html>

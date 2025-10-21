@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxelaunch - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body.dashboard-page {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+        }
+        
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .coin-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--squircle-radius);
+            object-fit: cover;
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+        }
+        
+        .coin-details h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            color: var(--text-primary);
+        }
+        
+        .coin-details .ticker {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .price-info {
+            text-align: right;
+        }
+        
+        .current-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin: 0;
+        }
+        
+        .price-change {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 5px 0 0 0;
+        }
+        
+        .price-change.positive {
+            color: #10B981;
+        }
+        
+        .price-change.negative {
+            color: #EF4444;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        .stat-card {
+            background-color: var(--surface-card);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            border-radius: var(--squircle-radius);
+            padding: 25px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 25px rgba(var(--shadow-medium-rgb), 0.07);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(var(--shadow-medium-rgb), 0.1);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
+            color: var(--text-primary);
+            border-radius: var(--squircle-radius-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+        }
+        
+        .liquidity-actions {
+            background-color: var(--surface-card);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            border-radius: var(--squircle-radius);
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(var(--shadow-medium-rgb), 0.07);
+            margin-bottom: 0;
+            min-height: 204px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .action-content {
+            width: 100%;
+        }
+        
+        .action-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 8px 0;
+        }
+        
+        .action-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0 0 20px 0;
+        }
+        
+        .remove-liquidity-btn {
+            background-color: #EF4444;
+            color: white;
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            padding: 12px 24px;
+            border-radius: var(--squircle-radius-small);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+        
+        .remove-liquidity-btn:hover {
+            background-color: #DC2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats-sidebar {
+                flex-direction: row;
+                gap: 15px;
+            }
+            
+            .stat-card {
+                flex: 1;
+                padding: 15px;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
+            }
+        }
+        
+        .chart-container {
+            background-color: var(--surface-card);
+            border-radius: var(--squircle-radius);
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(var(--shadow-medium-rgb), 0.07);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            margin-bottom: 30px;
+            flex: 1;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        
+        .chart-area {
+            height: 400px;
+            background-color: var(--bg-primary);
+            border-radius: var(--squircle-radius-small);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            height: 100%;
+            padding: 20px;
+            gap: 2px;
+        }
+        
+        .bar {
+            background-color: var(--brand-primary);
+            border-radius: 2px 2px 0 0;
+            min-width: 8px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        
+        .bar:hover {
+            background-color: var(--brand-primary-hover);
+        }
+        
+        .trading-activity {
+            background-color: var(--surface-card);
+            border-radius: var(--squircle-radius);
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(var(--shadow-medium-rgb), 0.07);
+            border: var(--cartoon-outline-thickness) solid var(--outline-cartoon);
+        }
+        
+        .activity-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 15px 0;
+        }
+        
+        .activity-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar styling */
+        .activity-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .activity-list::-webkit-scrollbar-track {
+            background: var(--surface-accent);
+            border-radius: 4px;
+        }
+        
+        .activity-list::-webkit-scrollbar-thumb {
+            background: var(--brand-primary);
+            border-radius: 4px;
+        }
+        
+        .activity-list::-webkit-scrollbar-thumb:hover {
+            background: var(--brand-primary-hover);
+        }
+        
+        .activity-list::-webkit-scrollbar-corner {
+            background: var(--surface-accent);
+        }
+        
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-default);
+            font-size: 0.9rem;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-type {
+            font-weight: 600;
+        }
+        
+        .activity-type.buy {
+            color: #10B981;
+        }
+        
+        .activity-type.sell {
+            color: #EF4444;
+        }
+        
+        .activity-amount {
+            color: var(--text-secondary);
+        }
+        
+        .activity-time {
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+        }
+        
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        
+        .theme-switch {
+            position: relative;
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            width: 38px; 
+            height: 38px;
+            cursor: pointer;
+            border-radius: 50%; 
+            background-color: var(--surface-accent);
+            transition: background-color 0.3s ease;
+            border: 1px solid var(--border-default); 
+        }
+        
+        .theme-switch:hover {
+            background-color: var(--border-default); 
+        }
+        
+        .theme-switch input { display: none; } 
+        
+        .theme-switch .icon-container {
+            position: relative; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+        }
+        
+        .theme-icon-sun, 
+        .theme-icon-moon {
+            position: absolute; 
+            font-size: 16px; 
+            color: var(--text-primary); 
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, color 0.3s ease;
+        }
+        
+        .theme-icon-moon { opacity: 0; transform: scale(0.7) rotate(-90deg); }
+        .theme-icon-sun { opacity: 1; transform: scale(1) rotate(0deg); }
+        
+        body.dark-theme .theme-icon-sun,
+        input:checked ~ .icon-container .theme-icon-sun { 
+            opacity: 0;
+            transform: scale(0.7) rotate(90deg);
+        }
+        body.dark-theme .theme-icon-moon,
+        input:checked ~ .icon-container .theme-icon-moon {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="coin-info">
+                <img id="coinIcon" src="#" alt="Coin Icon" class="coin-icon">
+                <div class="coin-details">
+                    <h1 id="coinName">Your Coin</h1>
+                    <div class="ticker" id="coinTicker">TICKER</div>
+                </div>
+            </div>
+            
+            
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <span class="icon-container">
+                        <i class="fas fa-sun theme-icon-sun"></i>
+                        <i class="fas fa-moon theme-icon-moon"></i>
+                    </span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Price Chart</h2>
+                </div>
+                <div class="chart-area">
+                    <div class="chart-bars" id="chartBars">
+                        <!-- Bars will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-sidebar">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Market Cap</div>
+                        <div class="stat-value" id="marketCap">$0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Liquidity Pool</div>
+                        <div class="stat-value" id="liquidityPool">$0</div>
+                    </div>
+                </div>
+                
+                <div class="liquidity-actions" id="liquidityActions">
+                    <div class="action-card">
+                        <div class="action-content">
+                            <h3 class="action-title">Remove Liquidity</h3>
+                            <p class="action-description">Withdraw your liquidity from the pool</p>
+                            <button class="remove-liquidity-btn" id="removeLiquidityBtn">
+                                <i class="fas fa-arrow-up"></i> Remove Liquidity
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="trading-activity">
+            <h3 class="activity-title">Recent Trading Activity</h3>
+            <div class="activity-list" id="activityList">
+                <div class="activity-item">
+                    <div>
+                        <div class="activity-type buy">Buy Order</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                    <div class="activity-amount">+$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard_script.js"></script>
+    <script src="theme.js"></script>
+</body>
+</html>
